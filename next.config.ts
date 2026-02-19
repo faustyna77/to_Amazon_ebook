@@ -11,7 +11,7 @@ const nextConfig: NextConfig = {
   //     },
   //   ],
   // },
-  //output: "export", // ⬅️ DODAJ TO
+  output: "export", // ⬅️ DODAJ TO
 
   
   eslint: {

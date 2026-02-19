@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { registerWithEmail, loginWithEmail, loginWithGoogle, getUserRole } from '../app/lib/auth';
-import Image from 'next/image';
+import { registerWithEmail, loginWithEmail, loginWithGoogle } from '../app/lib/auth';
 
 interface AuthFormProps {
   mode: 'login' | 'register';
@@ -17,15 +16,6 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleRedirectByRole = async () => {
-    const role = await getUserRole();
-    if (role === 'admin') {
-      router.push('/admin');
-    } else {
-      router.push('/dashboard');
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -37,10 +27,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
       } else {
         await loginWithEmail(email, password);
       }
-
-      // ✅ Pobieramy rolę i przekierowujemy
-      await handleRedirectByRole();
-
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -54,10 +41,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
 
     try {
       await loginWithGoogle();
-
-      // ✅ Google login też sprawdza rolę
-      await handleRedirectByRole();
-
+      router.push('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -66,32 +50,28 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center bg-gradient-to-br from-gray-950 via-gray-900 to-black text-white overflow-hidden">
-      
-
-      {/* Formularz logowania/rejestracji */}
-      <div className="relative z-10 max-w-md w-full bg-gray-900/70 backdrop-blur-xl border border-gray-800 rounded-2xl shadow-2xl p-8 space-y-8">
-        <div className="text-center">
-          <h2 className="text-3xl font-bold text-white">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             {mode === 'login' ? 'Zaloguj się' : 'Zarejestruj się'}
           </h2>
-
-          <div className="mt-3 text-sm text-gray-400 space-y-1">
+          
+          {/* POPRAWIONA STRUKTURA - wszystko w jednym div */}
+          <div className="mt-2 text-center text-sm text-gray-600 space-y-2">
             <div>
               {mode === 'login' ? 'Nie masz konta? ' : 'Masz już konto? '}
-              <a
-                href={mode === 'login' ? '/register' : '/login'}
-                className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+              <a 
+                href={mode === 'login' ? '/register' : '/login'} 
+                className="font-medium text-indigo-600 hover:text-indigo-500"
               >
                 {mode === 'login' ? 'Zarejestruj się' : 'Zaloguj się'}
               </a>
             </div>
+            
             {mode === 'login' && (
               <div>
-                <a
-                  href="/reset-password"
-                  className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
-                >
+                <a href="/reset-password" className="font-medium text-indigo-600 hover:text-indigo-500">
                   Zapomniałeś hasła?
                 </a>
               </div>
@@ -99,11 +79,11 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
           </div>
         </div>
 
-        <form className="space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             {mode === 'register' && (
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-1">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                   Imię i nazwisko
                 </label>
                 <input
@@ -113,14 +93,14 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Faustyna Misiura"
-                  className="w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                  className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                  placeholder="Jan Kowalski"
                 />
               </div>
             )}
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
               </label>
               <input
@@ -130,13 +110,13 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="faustyna@example.com"
-                className="w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
+                placeholder="jan@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                 Hasło
               </label>
               <input
@@ -146,24 +126,24 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
                 placeholder="Minimum 6 znaków"
                 minLength={6}
-                className="w-full px-3 py-2 bg-gray-800 text-white rounded-md border border-gray-700 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               />
             </div>
           </div>
 
           {error && (
-            <div className="bg-red-900/40 border border-red-700 text-red-400 px-4 py-3 rounded-md text-sm">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
               {error}
             </div>
           )}
 
-          <div className="space-y-4">
+          <div className="space-y-3">
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center items-center gap-2 py-2 px-4 rounded-md text-white bg-indigo-600 hover:bg-indigo-700 font-medium transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -172,17 +152,20 @@ const AuthForm: React.FC<AuthFormProps> = ({ mode }) => {
               )}
             </button>
 
-            <div className="flex items-center justify-center my-2">
-              <div className="border-t border-gray-700 w-full" />
-              <span className="px-2 text-gray-500 text-sm">lub</span>
-              <div className="border-t border-gray-700 w-full" />
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300" />
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-gray-50 text-gray-500">lub</span>
+              </div>
             </div>
 
             <button
               type="button"
               onClick={handleGoogleLogin}
               disabled={loading}
-              className="w-full flex justify-center items-center gap-3 py-2 px-4 rounded-md bg-gray-800 hover:bg-gray-700 border border-gray-700 text-gray-300 font-medium transition-all disabled:opacity-50"
+              className="w-full flex justify-center items-center gap-3 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
