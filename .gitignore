@@ -11,6 +11,7 @@
 !.yarn/versions
 .env.local
 .env
+serviceAccount.json
 .env.local
 # testing
 /coverage
